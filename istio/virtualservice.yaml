@@ -1,0 +1,23 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: api
+  namespace: istio-demo
+spec:
+  hosts:
+    - api
+    - api.istio-demo.svc.cluster.local
+    - api.192.168.56.101.nip.io
+  gateways:
+    - istio-system/istio-gateway
+  http:
+    - name: primary
+      route:
+        - destination:
+            host: api
+            subset: stable
+          weight: 100
+        - destination:
+            host: api
+            subset: canary
+          weight: 0
