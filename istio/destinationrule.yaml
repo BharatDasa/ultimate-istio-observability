@@ -1,14 +1,18 @@
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
+
 metadata:
   name: api
   namespace: istio-demo
+
 spec:
-  host: api
+  host: api-stable
+
   subsets:
     - name: stable
       labels:
         version: v1
+
     - name: canary
       labels:
         version: v2
