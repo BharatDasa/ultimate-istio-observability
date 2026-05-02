@@ -26,15 +26,6 @@ echo "⚙️ Deploying worker..."
 kubectl apply -f apps/worker/
 
 # ======================================================
-# API STABLE (V1)
-# ======================================================
-
-echo ""
-echo "🟢 Deploying stable API v1..."
-
-kubectl apply -f apps/api/deployment-v1.yaml
-
-# ======================================================
 # API SERVICES
 # ======================================================
 
