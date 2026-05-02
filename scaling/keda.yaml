@@ -23,7 +23,8 @@ spec:
     - type: prometheus
 
       metadata:
-        serverAddress: http://prometheus-monitoring-kube-prometheus-prometheus.monitoring:9090
+        serverAddress: http://monitoring-kube-prometheus-prometheus.monitoring:9090
+        
 
         metricName: istio_requests_total
 
@@ -37,3 +38,4 @@ spec:
           )
 
         threshold: "50"
+
