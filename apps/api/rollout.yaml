@@ -1,35 +1,55 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
+
 metadata:
   name: api
   namespace: istio-demo
+
 spec:
   replicas: 2
+
+  revisionHistoryLimit: 2
+
   selector:
     matchLabels:
       app: api
+
   template:
     metadata:
       labels:
         app: api
         version: v2
+
     spec:
       containers:
         - name: api
           image: bharatdasa/api:v2
+
           ports:
             - containerPort: 5000
+
   strategy:
     canary:
+
+      stableService: api-stable
+      canaryService: api-canary
+
       trafficRouting:
         istio:
           virtualService:
             name: api
             routes:
               - primary
+
       steps:
         - setWeight: 10
-        - pause: { duration: 30 }
+
+        - pause:
+            duration: 30s
+
         - setWeight: 50
-        - pause: { duration: 30 }
+
+        - pause:
+            duration: 30s
+
         - setWeight: 100
