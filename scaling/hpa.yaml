@@ -2,24 +2,22 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 
 metadata:
-  name: api-hpa
+  name: worker-hpa
   namespace: istio-demo
 
 spec:
   scaleTargetRef:
-    apiVersion: argoproj.io/v1alpha1
-    kind: Rollout
-    name: api
+    apiVersion: apps/v1
+    kind: Deployment
+    name: worker
 
-  minReplicas: 2
-  maxReplicas: 6
+  minReplicas: 1
+  maxReplicas: 5
 
   metrics:
     - type: Resource
-
       resource:
         name: cpu
-
         target:
           type: Utilization
           averageUtilization: 70
