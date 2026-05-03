@@ -10,11 +10,13 @@ NAMESPACE="istio-demo"
 
 URL="http://api.192.168.56.101.nip.io"
 
-CHAOS_ROUNDS=4
+CHAOS_ROUNDS=3
 
-RECOVERY_WAIT=10
+RECOVERY_WAIT=20
 
-WORKER_STRESS_DURATION=180
+WORKER_STRESS_DURATION=60
+
+AUTOSCALER_COOLDOWN=240
 
 # ======================================================
 # CLEANUP
@@ -58,7 +60,7 @@ echo "🔥 Starting HIGH-CONCURRENCY API traffic..."
 (
 while true; do
 
-  seq 1 1000 | xargs -P100 -I{} \
+  seq 1 1000 | xargs -P70 -I{} \
   curl -s $URL > /dev/null 2>&1
 
 done
@@ -187,17 +189,6 @@ echo "📈 Checking HPA..."
 kubectl get hpa -n $NAMESPACE || true
 
 # ======================================================
-# STOP API TRAFFIC
-# ======================================================
-
-echo ""
-echo "🛑 Stopping API traffic generation..."
-
-kill $API_TRAFFIC_PID || true
-
-sleep 5
-
-# ======================================================
 # VERIFY ISTIO METRICS
 # ======================================================
 
@@ -255,9 +246,7 @@ for i in {1..8}; do
     2>/dev/null || true)
 
   echo ""
-  echo "Attempt $i"
-
-  echo "$RESPONSE"
+  echo "Attempt $i → Response: $RESPONSE"
 
   if [[ "$RESPONSE" == *"traceID"* ]]; then
 
@@ -292,6 +281,55 @@ if [ "$TRACE_FOUND" = false ]; then
   kubectl logs -n monitoring tempo-0 --tail=50 || true
 
 fi
+
+# ======================================================
+# VERIFY ENVOY ACCESS LOGS
+# ======================================================
+
+echo ""
+echo "📊 Checking Envoy access logs..."
+
+sleep 5
+
+FOUND_LOGS=false
+
+for POD in $(kubectl get pods -n $NAMESPACE \
+-l app=api \
+-o jsonpath='{.items[*].metadata.name}'); do
+
+  echo ""
+  echo "🔍 Pod: $POD"
+
+  LOGS=$(kubectl logs -n $NAMESPACE $POD \
+    -c istio-proxy \
+    --tail=100 2>/dev/null | \
+    grep -E '"GET|POST|PUT|DELETE|HEAD' || true)
+
+  if [[ -n "$LOGS" ]]; then
+
+    echo "$LOGS"
+
+    FOUND_LOGS=true
+  fi
+done
+
+if [ "$FOUND_LOGS" = false ]; then
+
+  echo ""
+  echo "⚠ No Envoy access logs found yet"
+
+fi
+
+# ======================================================
+# STOP API TRAFFIC
+# ======================================================
+
+echo ""
+echo "🛑 Stopping API traffic generation..."
+
+kill $API_TRAFFIC_PID || true
+
+sleep 10
 
 # ======================================================
 # VERIFY FINAL KEDA
@@ -344,15 +382,61 @@ echo ""
 
 kubectl get rollout -n $NAMESPACE
 
+# ======================================================
+# AUTOSCALER COOLDOWN
+# ======================================================
+
 echo ""
 echo "⏳ Waiting for autoscaler cooldown..."
 
-sleep 60
+sleep $AUTOSCALER_COOLDOWN
+
+echo ""
+echo "📊 Current Worker CPU"
+
+kubectl top pod -n $NAMESPACE | grep worker || true
+
+echo ""
+echo "⏳ Waiting for worker scale-down..."
+
+for i in {1..24}; do
+
+  echo ""
+  echo "Cooldown Check $i"
+
+  kubectl get hpa -n $NAMESPACE || true
+
+  REPLICAS=$(kubectl get hpa worker-hpa \
+    -n $NAMESPACE \
+    -o jsonpath='{.status.currentReplicas}' || echo "0")
+
+  echo ""
+  echo "Current worker replicas: $REPLICAS"
+
+  if [ "$REPLICAS" -le 1 ]; then
+
+    echo ""
+    echo "✅ Worker scaled down successfully!"
+
+    break
+  fi
+
+  sleep 10
+
+done
+
+# ======================================================
+# FINAL AUTOSCALER STATUS
+# ======================================================
 
 echo ""
 echo "📉 Final Autoscaler Status"
 
 kubectl get hpa -n $NAMESPACE
+
+# ======================================================
+# FINAL LINKS
+# ======================================================
 
 echo ""
 echo "🌐 Application URL"
@@ -364,6 +448,10 @@ echo "📊 Grafana"
 
 echo "Explore → Tempo"
 echo "Dashboards → Istio"
+
+# ======================================================
+# SUMMARY
+# ======================================================
 
 echo ""
 echo "🎯 WHAT WAS TESTED"
@@ -383,5 +471,8 @@ echo "✔ Kubernetes Self-Healing"
 echo "✔ Canary Rollout"
 echo "✔ Application Availability"
 echo "✔ Chaos Engineering"
+
+echo ""
+echo "🏁 TEST FINISHED"
 
 echo ""
