@@ -833,3 +833,6 @@ This project successfully demonstrates:
 ✅ End-to-end telemetry pipelines
 
 ✅ Real-world DevOps platform engineering patterns
+
+<img width="2337" height="1568" alt="image" src="https://github.com/user-attachments/assets/6d8b0f81-1183-4db2-af5b-06e297550064" />
+
