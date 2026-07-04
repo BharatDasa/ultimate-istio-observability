@@ -55,6 +55,12 @@ The platform repository includes enterprise-grade infrastructure such as:
 - Nexus Artifact Repository
 - Ansible Automation
 - Trivy DevSecOps Security Pipeline
+- Storage setup(NFS)
+- Database (PSQL, MONGODB)
+- Kafka
+- Airflow
+- Keda
+- HPA
 - Prometheus Monitoring
 - Grafana Dashboards
 - Loki Log Aggregation
