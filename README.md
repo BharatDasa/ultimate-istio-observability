@@ -35,6 +35,56 @@ The platform simulates a real-world microservices environment where:
 
 ---
 
+## Platform Infrastructure
+
+---
+
+# 🏗 Enterprise Platform Infrastructure
+
+This application is built on top of a reusable **Enterprise Platform Engineering** foundation that provides the complete DevSecOps, GitOps, Kubernetes, Observability, and Platform Engineering ecosystem used across all of my projects.
+
+The platform repository includes enterprise-grade infrastructure such as:
+
+- Jenkins Dynamic Kubernetes Agents
+- GitHub Actions
+- GitOps with ArgoCD
+- Kubernetes Cluster Configuration
+- Helm Charts
+- Docker & Kaniko Image Builds
+- Apache Tomcat Deployment
+- Nexus Artifact Repository
+- Ansible Automation
+- Trivy DevSecOps Security Pipeline
+- Prometheus Monitoring
+- Grafana Dashboards
+- Loki Log Aggregation
+- Promtail Log Collection
+- Tempo Distributed Tracing
+- OpenTelemetry
+- AlertManager
+- Slack Notifications
+- Horizontal Pod Autoscaler (HPA)
+- Istio Service Mesh
+- Multi-Environment Deployments (Development, Staging, Production)
+- Enterprise CI/CD Pipelines
+- Infrastructure Automation
+- Platform Documentation
+
+> **Repository:** Platform-Engineering-Devops-setup *(Private Repository)*
+
+🔒 **Access Notice**
+
+The Platform Engineering repository is currently **private** because it contains reusable enterprise platform components, infrastructure automation, deployment templates, and internal platform configurations shared across multiple projects.
+
+If you are a **recruiter, hiring manager, interviewer, or engineering professional** interested in reviewing the complete Platform Engineering implementation, please contact me to request access.
+
+📧 **Email:** **dasabharat90@gmail.com**
+
+Access requests are reviewed and granted upon request.
+
+---
+
+
 # 🧠 What This Project Demonstrates
 
 ## ✅ Kubernetes Self-Healing
